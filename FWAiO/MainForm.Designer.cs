@@ -37,9 +37,16 @@
             this.AboutTab_GameDescription = new System.Windows.Forms.Label();
             this.AboutTab_GameName = new System.Windows.Forms.Label();
             this.DownloadTab = new System.Windows.Forms.TabPage();
+            this.wm = new System.Windows.Forms.Label();
+            this.downloadingPanel = new System.Windows.Forms.Panel();
+            this.CancelDownload = new System.Windows.Forms.Button();
+            this.dlProgressTxt = new System.Windows.Forms.Label();
+            this.dlspeed = new System.Windows.Forms.Label();
+            this.gmdlpg = new System.Windows.Forms.ProgressBar();
+            this.label1 = new System.Windows.Forms.Label();
             this.NoWifiPanel = new System.Windows.Forms.Panel();
             this.NoWifiLabel = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.lncdl = new System.Windows.Forms.Button();
             this.DLPage_GameVnum = new System.Windows.Forms.Label();
             this.GameName_DownloadTab = new System.Windows.Forms.Label();
             this.SelectGameInstallationFolder = new System.Windows.Forms.FolderBrowserDialog();
@@ -47,6 +54,7 @@
             this.TabSwitcher.SuspendLayout();
             this.AboutTab.SuspendLayout();
             this.DownloadTab.SuspendLayout();
+            this.downloadingPanel.SuspendLayout();
             this.NoWifiPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -145,8 +153,10 @@
             // 
             // DownloadTab
             // 
+            this.DownloadTab.Controls.Add(this.wm);
+            this.DownloadTab.Controls.Add(this.downloadingPanel);
             this.DownloadTab.Controls.Add(this.NoWifiPanel);
-            this.DownloadTab.Controls.Add(this.button1);
+            this.DownloadTab.Controls.Add(this.lncdl);
             this.DownloadTab.Controls.Add(this.DLPage_GameVnum);
             this.DownloadTab.Controls.Add(this.GameName_DownloadTab);
             this.DownloadTab.Location = new System.Drawing.Point(4, 24);
@@ -157,11 +167,77 @@
             this.DownloadTab.Text = "Download";
             this.DownloadTab.UseVisualStyleBackColor = true;
             // 
+            // wm
+            // 
+            this.wm.AutoSize = true;
+            this.wm.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.wm.Location = new System.Drawing.Point(11, 382);
+            this.wm.Name = "wm";
+            this.wm.Size = new System.Drawing.Size(463, 32);
+            this.wm.TabIndex = 7;
+            this.wm.Text = "The game is not out yet, come back soon!";
+            // 
+            // downloadingPanel
+            // 
+            this.downloadingPanel.Controls.Add(this.CancelDownload);
+            this.downloadingPanel.Controls.Add(this.dlProgressTxt);
+            this.downloadingPanel.Controls.Add(this.dlspeed);
+            this.downloadingPanel.Controls.Add(this.gmdlpg);
+            this.downloadingPanel.Controls.Add(this.label1);
+            this.downloadingPanel.Location = new System.Drawing.Point(0, 324);
+            this.downloadingPanel.Name = "downloadingPanel";
+            this.downloadingPanel.Size = new System.Drawing.Size(997, 100);
+            this.downloadingPanel.TabIndex = 6;
+            this.downloadingPanel.Visible = false;
+            // 
+            // CancelDownload
+            // 
+            this.CancelDownload.Location = new System.Drawing.Point(913, 64);
+            this.CancelDownload.Name = "CancelDownload";
+            this.CancelDownload.Size = new System.Drawing.Size(75, 23);
+            this.CancelDownload.TabIndex = 9;
+            this.CancelDownload.Text = "Cancel";
+            this.CancelDownload.UseVisualStyleBackColor = true;
+            this.CancelDownload.Click += new System.EventHandler(this.cancdlbtnclic);
+            // 
+            // dlProgressTxt
+            // 
+            this.dlProgressTxt.AutoSize = true;
+            this.dlProgressTxt.Location = new System.Drawing.Point(232, 35);
+            this.dlProgressTxt.Name = "dlProgressTxt";
+            this.dlProgressTxt.Size = new System.Drawing.Size(0, 15);
+            this.dlProgressTxt.TabIndex = 8;
+            // 
+            // dlspeed
+            // 
+            this.dlspeed.AutoSize = true;
+            this.dlspeed.Location = new System.Drawing.Point(192, 35);
+            this.dlspeed.Name = "dlspeed";
+            this.dlspeed.Size = new System.Drawing.Size(0, 15);
+            this.dlspeed.TabIndex = 7;
+            // 
+            // gmdlpg
+            // 
+            this.gmdlpg.Location = new System.Drawing.Point(15, 56);
+            this.gmdlpg.Name = "gmdlpg";
+            this.gmdlpg.Size = new System.Drawing.Size(883, 31);
+            this.gmdlpg.TabIndex = 6;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.Location = new System.Drawing.Point(15, 18);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(171, 32);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Downloading...";
+            // 
             // NoWifiPanel
             // 
             this.NoWifiPanel.Controls.Add(this.NoWifiLabel);
             this.NoWifiPanel.Cursor = System.Windows.Forms.Cursors.No;
-            this.NoWifiPanel.Location = new System.Drawing.Point(918, 373);
+            this.NoWifiPanel.Location = new System.Drawing.Point(976, 115);
             this.NoWifiPanel.Name = "NoWifiPanel";
             this.NoWifiPanel.Size = new System.Drawing.Size(992, 418);
             this.NoWifiPanel.TabIndex = 4;
@@ -177,15 +253,16 @@
             this.NoWifiLabel.TabIndex = 0;
             this.NoWifiLabel.Text = "HAHA NO INTERNET!!!!!!!!!!!!!!!11!\\";
             // 
-            // button1
+            // lncdl
             // 
-            this.button1.Location = new System.Drawing.Point(6, 67);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(134, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Download this version";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.DownloadGameAndSelctDir);
+            this.lncdl.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lncdl.Location = new System.Drawing.Point(691, 6);
+            this.lncdl.Name = "lncdl";
+            this.lncdl.Size = new System.Drawing.Size(299, 58);
+            this.lncdl.TabIndex = 2;
+            this.lncdl.Text = "Download latest launcher";
+            this.lncdl.UseVisualStyleBackColor = true;
+            this.lncdl.Click += new System.EventHandler(this.DownloadLaunAndSelctDir);
             // 
             // DLPage_GameVnum
             // 
@@ -207,10 +284,6 @@
             this.GameName_DownloadTab.TabIndex = 0;
             this.GameName_DownloadTab.Text = "Download - FWAiO";
             // 
-            // SelectGameInstallationFolder
-            // 
-            this.SelectGameInstallationFolder.Description = "The game will be installed here.";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -229,6 +302,8 @@
             this.AboutTab.PerformLayout();
             this.DownloadTab.ResumeLayout(false);
             this.DownloadTab.PerformLayout();
+            this.downloadingPanel.ResumeLayout(false);
+            this.downloadingPanel.PerformLayout();
             this.NoWifiPanel.ResumeLayout(false);
             this.NoWifiPanel.PerformLayout();
             this.ResumeLayout(false);
@@ -248,9 +323,16 @@
         private Button WinMin;
         private Label DLPage_GameVnum;
         private Label GameName_DownloadTab;
-        private Button button1;
+        private Button lncdl;
         private Panel NoWifiPanel;
         private Label NoWifiLabel;
         private FolderBrowserDialog SelectGameInstallationFolder;
+        private Label label1;
+        private Panel downloadingPanel;
+        private ProgressBar gmdlpg;
+        private Label dlspeed;
+        private Label dlProgressTxt;
+        private Button CancelDownload;
+        private Label wm;
     }
 }

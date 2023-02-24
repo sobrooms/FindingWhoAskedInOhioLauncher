@@ -1,6 +1,8 @@
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.Logging;
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.AccessControl;
@@ -13,6 +15,8 @@ namespace FWAiO
         DirectoryInfo GameAppData = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)) + "\\sobrooms\\FWAiO_(laun)");
         Point lastPoint;
         private string LocalGVer = "alpha_0.0.5";
+        WebClient client = new();
+        bool GameDownloadCanceled;
         public MainForm()
         {
             InitializeComponent();
@@ -156,11 +160,7 @@ namespace FWAiO
             }
         }
 
-        private async void DownloadGameAndSelctDir(object sender, EventArgs e)
-        {
-            await DownloadGameAndSelctDirObj();
-        }
-        private async Task DownloadGameAndSelctDirObj()
+        private async Task DownloadLaunAndSelctDirObj()
         {
             using (var fbd = this.SelectGameInstallationFolder)
             {
@@ -168,13 +168,12 @@ namespace FWAiO
 
                 if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 {
-                    string[] files = Directory.GetFiles(fbd.SelectedPath);
                     if (Directory.GetFiles(fbd.SelectedPath).Length > 0)
                     {
                         var cm = MessageBox.Show("Please select a folder with no files in it.", "Game Installation", MessageBoxButtons.OKCancel);
                         if (cm == DialogResult.OK)
                         {
-                            await DownloadGameAndSelctDirObj();
+                            await DownloadLaunAndSelctDirObj();
                         }
                     }
                     else
@@ -182,13 +181,55 @@ namespace FWAiO
                         var cm = MessageBox.Show("Are you sure you want to install the game in the selected directory? (" + fbd.SelectedPath + ")", "Game Installation", MessageBoxButtons.YesNo);
                         if (cm == DialogResult.Yes)
                         {
-                            await new WebClient().DownloadFileTaskAsync("https://cdn.discordapp.com/attachments/1078550595092369488/1078669027276238928/Lyuuxploit_v0.6.zip", GameAppData + "/app.zip");
+                            this.wm.Visible = false;
+                            GameDownloadCanceled = false;
+                            this.downloadingPanel.Visible = true;
+                            client.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadCompleted);
+                            client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+                            await client.DownloadFileTaskAsync(new Uri(await new HttpClient().GetStringAsync("https://site-psa-mang.vercel.app/Download.lu.wai.txt")), GameAppData + "/app.zip");
                             System.IO.Compression.ZipFile.ExtractToDirectory(GameAppData + "/app.zip", fbd.SelectedPath);
                             File.Delete(GameAppData + "/app.zip");
                         }
                     }
                 }
             }
+        }
+        private void ProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            Stopwatch sw = new();
+            this.gmdlpg.Value = e.ProgressPercentage;
+            this.dlspeed.Text = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
+            this.dlProgressTxt.Text = string.Format("{0}MB / {1}MB",(e.BytesReceived / 1024d / 1024d).ToString("0.00"), (e.TotalBytesToReceive / 1024d / 1024d).ToString("0.00"));
+        }
+
+        private void DownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            this.wm.Visible = true;
+            this.downloadingPanel.Visible = false;
+            if (GameDownloadCanceled) { } else MessageBox.Show("The game has been downloaded completely at " + this.SelectGameInstallationFolder.SelectedPath, "Download complete", MessageBoxButtons.OK);
+        }
+
+        private void cancdlbtnclic(object sender, EventArgs e)
+        {
+            var cm = MessageBox.Show("Are you sure you want to cancel the download?", "Cancel download", MessageBoxButtons.YesNo);
+            if (cm == DialogResult.Yes)
+            {
+                GameDownloadCanceled = true;
+                client.CancelAsync();
+                this.downloadingPanel.Visible = false;
+                MessageBox.Show("Canceled download.", "", MessageBoxButtons.OK);
+                File.Delete(GameAppData + "/app.zip");
+                client.Dispose();
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private async void DownloadLaunAndSelctDir(object sender, EventArgs e)
+        {
+            await DownloadLaunAndSelctDirObj();
         }
     }
 }

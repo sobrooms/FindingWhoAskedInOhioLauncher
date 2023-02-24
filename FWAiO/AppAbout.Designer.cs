@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.hi = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -36,7 +37,6 @@
             this.WinMin = new System.Windows.Forms.Button();
             this.gameName = new System.Windows.Forms.Label();
             this.WinExi = new System.Windows.Forms.Button();
-            this.hi = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,6 +58,15 @@
             this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
             this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
             // 
+            // hi
+            // 
+            this.hi.AutoSize = true;
+            this.hi.Font = new System.Drawing.Font("Segoe UI", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.hi.Location = new System.Drawing.Point(12, 56);
+            this.hi.Name = "hi";
+            this.hi.Size = new System.Drawing.Size(0, 47);
+            this.hi.TabIndex = 10;
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -72,11 +81,11 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label3.Location = new System.Drawing.Point(110, 150);
+            this.label3.Location = new System.Drawing.Point(213, 150);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 32);
             this.label3.TabIndex = 8;
-            this.label3.Text = "v0.0.5";
+            this.label3.Text = "v0.0.2";
             // 
             // label2
             // 
@@ -84,9 +93,9 @@
             this.label2.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.label2.Location = new System.Drawing.Point(12, 150);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(97, 32);
+            this.label2.Size = new System.Drawing.Size(201, 32);
             this.label2.TabIndex = 7;
-            this.label2.Text = "Version:";
+            this.label2.Text = "Launcher Version:";
             // 
             // label1
             // 
@@ -131,15 +140,6 @@
             this.WinExi.Text = "X";
             this.WinExi.UseVisualStyleBackColor = true;
             this.WinExi.Click += new System.EventHandler(this.UI_Button_Exit_Click);
-            // 
-            // hi
-            // 
-            this.hi.AutoSize = true;
-            this.hi.Font = new System.Drawing.Font("Segoe UI", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.hi.Location = new System.Drawing.Point(12, 56);
-            this.hi.Name = "hi";
-            this.hi.Size = new System.Drawing.Size(0, 47);
-            this.hi.TabIndex = 10;
             // 
             // AppAbout
             // 
