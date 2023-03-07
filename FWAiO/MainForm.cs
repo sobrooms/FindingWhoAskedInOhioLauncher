@@ -12,9 +12,10 @@ namespace FWAiO
 {
     public partial class MainForm : Form
     {
+        private bool GameVersionIsLatest = true;
         DirectoryInfo GameAppData = Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)) + "\\sobrooms\\FWAiO_(laun)");
         Point lastPoint;
-        private string LocalGVer = "alpha_0.0.5";
+        private string LocalGVer = "alpha_0.5.4\n";
         WebClient client = new();
         bool GameDownloadCanceled;
         public MainForm()
@@ -93,7 +94,10 @@ namespace FWAiO
 
             // dbg
             if (File.ReadAllText(@sbrAD + ".gamev") != LocalGVer)
+            {
                 await WriteLog("current gv != localgv, please update");
+                GameVersionIsLatest = false;
+            }
             SetDbgDetails();
             if (Internet())
             {
@@ -103,6 +107,14 @@ namespace FWAiO
             {
                 this.NoWifiPanel.Visible = true;
                 this.NoWifiLabel.Text = "Not connected to internet. \r\nCannot download the game.\nSorry, " + System.Environment.UserName + ".";
+            }
+            if (File.Exists(@GameAppData + "/.gamepath"))
+            {
+                if (GameVersionIsLatest && File.Exists(File.ReadAllText(@GameAppData + "/.gamepath") + "/FindingWhoAskedInOhio.exe"))
+                {
+                    this.playgamebutton.Visible = true;
+                    this.downloadgamebutton.Visible = false;
+                }
             }
         }
 
@@ -170,10 +182,50 @@ namespace FWAiO
                 {
                     if (Directory.GetFiles(fbd.SelectedPath).Length > 0)
                     {
-                        var cm = MessageBox.Show("Please select a folder with no files in it.", "Game Installation", MessageBoxButtons.OKCancel);
+                        var cm = MessageBox.Show("Please select a folder with no files in it.", "Latest Launcher Installation", MessageBoxButtons.OKCancel);
                         if (cm == DialogResult.OK)
                         {
                             await DownloadLaunAndSelctDirObj();
+                        }
+                    }
+                    else
+                    {
+                        var cm = MessageBox.Show("Are you sure you want to install the launcher in the selected directory? (" + fbd.SelectedPath + ")", "Launcher Installation", MessageBoxButtons.YesNo);
+                        if (cm == DialogResult.Yes)
+                        {
+                            this.wm.Visible = false;
+                            GameDownloadCanceled = false;
+                            this.downloadgamebutton.Visible = false;
+                            this.playgamebutton.Visible = false;
+                            this.lncdl.Visible = false;
+                            this.downloadingPanel.Visible = true;
+                            client.DownloadFileCompleted += new AsyncCompletedEventHandler(LauncherDownloadComplete);
+                            client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
+                            await client.DownloadFileTaskAsync(new Uri(await new HttpClient().GetStringAsync("https://site-psa-mang.vercel.app/Download.lu.wai.txt")), GameAppData + "/app.zip");
+                            System.IO.Compression.ZipFile.ExtractToDirectory(GameAppData + "/app.zip", fbd.SelectedPath);
+                            File.Delete(GameAppData + "/app.zip");
+                            this.downloadgamebutton.Visible = true;
+                            this.playgamebutton.Visible = true;
+                            this.lncdl.Visible = true;
+                        }
+                    }
+                }
+            }
+        }
+        private async Task DownloadGameAndSelctDirObj()
+        {
+            using (var fbd = this.SelectGameInstallationFolder)
+            {
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    if (Directory.GetFiles(fbd.SelectedPath).Length > 0)
+                    {
+                        var cm = MessageBox.Show("Please select a folder with no files in it.", "Latest Launcher Installation", MessageBoxButtons.OKCancel);
+                        if (cm == DialogResult.OK)
+                        {
+                            await DownloadGameAndSelctDirObj();
                         }
                     }
                     else
@@ -184,11 +236,15 @@ namespace FWAiO
                             this.wm.Visible = false;
                             GameDownloadCanceled = false;
                             this.downloadingPanel.Visible = true;
-                            client.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadCompleted);
+                            this.downloadgamebutton.Visible = false;
+                            this.playgamebutton.Visible = false;
+                            this.lncdl.Visible = false;
+                            client.DownloadFileCompleted += new AsyncCompletedEventHandler(GameDownloadCompleted);
                             client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(ProgressChanged);
-                            await client.DownloadFileTaskAsync(new Uri(await new HttpClient().GetStringAsync("https://site-psa-mang.vercel.app/Download.lu.wai.txt")), GameAppData + "/app.zip");
-                            System.IO.Compression.ZipFile.ExtractToDirectory(GameAppData + "/app.zip", fbd.SelectedPath);
-                            File.Delete(GameAppData + "/app.zip");
+                            await client.DownloadFileTaskAsync(new Uri(await new HttpClient().GetStringAsync("https://site-psa-mang.vercel.app/Download.wai.txt")), GameAppData + "/game.zip");
+                            System.IO.Compression.ZipFile.ExtractToDirectory(GameAppData + "/game.zip", fbd.SelectedPath);
+                            File.Delete(GameAppData + "/game.zip");
+                            await File.WriteAllTextAsync(GameAppData + "/.gamepath", fbd.SelectedPath, System.Text.Encoding.UTF8);
                         }
                     }
                 }
@@ -199,14 +255,32 @@ namespace FWAiO
             Stopwatch sw = new();
             this.gmdlpg.Value = e.ProgressPercentage;
             this.dlspeed.Text = string.Format("{0} kb/s", (e.BytesReceived / 1024d / sw.Elapsed.TotalSeconds).ToString("0.00"));
-            this.dlProgressTxt.Text = string.Format("{0}MB / {1}MB",(e.BytesReceived / 1024d / 1024d).ToString("0.00"), (e.TotalBytesToReceive / 1024d / 1024d).ToString("0.00"));
+            this.dlProgressTxt.Text = string.Format("{0}MB / {1}MB", (e.BytesReceived / 1024d / 1024d).ToString("0.00"), (e.TotalBytesToReceive / 1024d / 1024d).ToString("0.00"));
         }
 
-        private void DownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        private void GameDownloadCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            this.downloadingPanel.Visible = false;
+            this.lncdl.Visible = true;
+            this.playgamebutton.Visible = true;
+            this.downloadgamebutton.Visible = false;
+            this.wm.Visible = true;
+            if (GameDownloadCanceled) { } else MessageBox.Show("The game has been downloaded completely at " + this.SelectGameInstallationFolder.SelectedPath, "Download complete", MessageBoxButtons.OK);
+        }
+        private void LauncherDownloadComplete(object sender, AsyncCompletedEventArgs e)
         {
             this.wm.Visible = true;
             this.downloadingPanel.Visible = false;
-            if (GameDownloadCanceled) { } else MessageBox.Show("The game has been downloaded completely at " + this.SelectGameInstallationFolder.SelectedPath, "Download complete", MessageBoxButtons.OK);
+            this.lncdl.Visible = true;
+            if (File.Exists(@GameAppData + "/.gamepath"))
+            {
+                if (GameVersionIsLatest && File.Exists(File.ReadAllText(@GameAppData + "/.gamepath") + "/FindingWhoAskedInOhio.exe"))
+                {
+                    this.playgamebutton.Visible = true;
+                    this.downloadgamebutton.Visible = false;
+                }
+            }
+            if (GameDownloadCanceled) { } else MessageBox.Show("The latest launcher has been downloaded completely at " + this.SelectGameInstallationFolder.SelectedPath + ". Please delete this version from your computer and use the latest...", "Download complete", MessageBoxButtons.OK);
         }
 
         private void cancdlbtnclic(object sender, EventArgs e)
@@ -230,6 +304,19 @@ namespace FWAiO
         private async void DownloadLaunAndSelctDir(object sender, EventArgs e)
         {
             await DownloadLaunAndSelctDirObj();
+        }
+        private async void DownloadGameAndSelctDir(object sender, EventArgs e)
+        {
+            await DownloadGameAndSelctDirObj();
+        }
+        private async Task PlayGameObj()
+        {
+            ProcessStartInfo A = new(@File.ReadAllText(GameAppData + "/.gamepath").ToString() + "/FindingWhoAskedInOhio.exe");
+            Process.Start(A);
+        }
+        private void PlayGame(object sender, EventArgs e)
+        {
+            PlayGameObj();
         }
     }
 }

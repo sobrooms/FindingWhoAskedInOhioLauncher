@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.WinMin = new System.Windows.Forms.Button();
             this.gameName = new System.Windows.Forms.Label();
@@ -37,13 +38,15 @@
             this.AboutTab_GameDescription = new System.Windows.Forms.Label();
             this.AboutTab_GameName = new System.Windows.Forms.Label();
             this.DownloadTab = new System.Windows.Forms.TabPage();
-            this.wm = new System.Windows.Forms.Label();
+            this.playgamebutton = new System.Windows.Forms.Button();
             this.downloadingPanel = new System.Windows.Forms.Panel();
             this.CancelDownload = new System.Windows.Forms.Button();
             this.dlProgressTxt = new System.Windows.Forms.Label();
             this.dlspeed = new System.Windows.Forms.Label();
             this.gmdlpg = new System.Windows.Forms.ProgressBar();
             this.label1 = new System.Windows.Forms.Label();
+            this.downloadgamebutton = new System.Windows.Forms.Button();
+            this.wm = new System.Windows.Forms.Label();
             this.NoWifiPanel = new System.Windows.Forms.Panel();
             this.NoWifiLabel = new System.Windows.Forms.Label();
             this.lncdl = new System.Windows.Forms.Button();
@@ -153,8 +156,10 @@
             // 
             // DownloadTab
             // 
-            this.DownloadTab.Controls.Add(this.wm);
+            this.DownloadTab.Controls.Add(this.playgamebutton);
             this.DownloadTab.Controls.Add(this.downloadingPanel);
+            this.DownloadTab.Controls.Add(this.downloadgamebutton);
+            this.DownloadTab.Controls.Add(this.wm);
             this.DownloadTab.Controls.Add(this.NoWifiPanel);
             this.DownloadTab.Controls.Add(this.lncdl);
             this.DownloadTab.Controls.Add(this.DLPage_GameVnum);
@@ -167,15 +172,17 @@
             this.DownloadTab.Text = "Download";
             this.DownloadTab.UseVisualStyleBackColor = true;
             // 
-            // wm
+            // playgamebutton
             // 
-            this.wm.AutoSize = true;
-            this.wm.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.wm.Location = new System.Drawing.Point(11, 382);
-            this.wm.Name = "wm";
-            this.wm.Size = new System.Drawing.Size(463, 32);
-            this.wm.TabIndex = 7;
-            this.wm.Text = "The game is not out yet, come back soon!";
+            this.playgamebutton.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.playgamebutton.Location = new System.Drawing.Point(11, 353);
+            this.playgamebutton.Name = "playgamebutton";
+            this.playgamebutton.Size = new System.Drawing.Size(299, 58);
+            this.playgamebutton.TabIndex = 1;
+            this.playgamebutton.Text = "Play";
+            this.playgamebutton.UseVisualStyleBackColor = true;
+            this.playgamebutton.Visible = false;
+            this.playgamebutton.Click += new System.EventHandler(this.PlayGame);
             // 
             // downloadingPanel
             // 
@@ -233,11 +240,33 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Downloading...";
             // 
+            // downloadgamebutton
+            // 
+            this.downloadgamebutton.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.downloadgamebutton.Location = new System.Drawing.Point(11, 353);
+            this.downloadgamebutton.Name = "downloadgamebutton";
+            this.downloadgamebutton.Size = new System.Drawing.Size(299, 58);
+            this.downloadgamebutton.TabIndex = 2;
+            this.downloadgamebutton.Text = "Download/Update";
+            this.downloadgamebutton.UseVisualStyleBackColor = true;
+            this.downloadgamebutton.Click += new System.EventHandler(this.DownloadGameAndSelctDir);
+            // 
+            // wm
+            // 
+            this.wm.AutoSize = true;
+            this.wm.Enabled = false;
+            this.wm.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.wm.Location = new System.Drawing.Point(954, 11);
+            this.wm.Name = "wm";
+            this.wm.Size = new System.Drawing.Size(0, 32);
+            this.wm.TabIndex = 7;
+            this.wm.Visible = false;
+            // 
             // NoWifiPanel
             // 
             this.NoWifiPanel.Controls.Add(this.NoWifiLabel);
             this.NoWifiPanel.Cursor = System.Windows.Forms.Cursors.No;
-            this.NoWifiPanel.Location = new System.Drawing.Point(976, 115);
+            this.NoWifiPanel.Location = new System.Drawing.Point(974, 56);
             this.NoWifiPanel.Name = "NoWifiPanel";
             this.NoWifiPanel.Size = new System.Drawing.Size(992, 418);
             this.NoWifiPanel.TabIndex = 4;
@@ -255,8 +284,8 @@
             // 
             // lncdl
             // 
-            this.lncdl.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.lncdl.Location = new System.Drawing.Point(691, 6);
+            this.lncdl.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lncdl.Location = new System.Drawing.Point(316, 353);
             this.lncdl.Name = "lncdl";
             this.lncdl.Size = new System.Drawing.Size(299, 58);
             this.lncdl.TabIndex = 2;
@@ -292,6 +321,7 @@
             this.ClientSize = new System.Drawing.Size(997, 487);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "Finding Who Asked In Ohio";
             this.Load += new System.EventHandler(this.InitialLoad);
@@ -334,5 +364,7 @@
         private Label dlProgressTxt;
         private Button CancelDownload;
         private Label wm;
+        private Button downloadgamebutton;
+        private Button playgamebutton;
     }
 }
